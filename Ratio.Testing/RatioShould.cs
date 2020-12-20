@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Xunit;
 
 namespace CalvinReed.Testing
@@ -5,20 +6,23 @@ namespace CalvinReed.Testing
     public class RatioShould
     {
         [Theory]
-        [InlineData(1, 3, 1, 3)]
-        [InlineData(-1, -3, 1, 3)]
-        [InlineData(1, -3, -1, 3)]
-        [InlineData(-1, 3, -1, 3)]
-        [InlineData(2, 3, 2, 3)]
-        [InlineData(2, 6, 1, 3)]
-        [InlineData(2, -6, -1, 3)]
-        [InlineData(-2, 6, -1, 3)]
-        [InlineData(3, 3, 1, 1)]
-        public void BeReduced(int n, int d, int reducedN, int reducedD)
+        [MemberData(nameof(AdditionData))]
+        public void AddCorrectly(Ratio a, Ratio b, Ratio c)
         {
-            var ratio = Ratio.Create(n, d);
-            Assert.Equal(reducedN, ratio.Numerator);
-            Assert.Equal(reducedD, ratio.Denominator);
+            Assert.Equal(c, a + b);
+        }
+
+        [Fact]
+        public void HaveCorrectDefault()
+        {
+            Assert.Equal(0, default(Ratio));
+        }
+
+        public static IEnumerable<object[]> AdditionData()
+        {
+            yield return new object[] {Ratio.Create(1, 3), Ratio.Create(1, 3), Ratio.Create(2, 3)};
+            yield return new object[] {Ratio.Create(1, 3), Ratio.Create(-1, 3), Ratio.Create(0, 1)};
+            yield return new object[] {Ratio.Create(9, 7), Ratio.Create(-2, 7), Ratio.Create(1, 1)};
         }
     }
 }
