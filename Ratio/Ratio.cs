@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 
 namespace CalvinReed
 {
@@ -166,17 +167,33 @@ namespace CalvinReed
             return a / gcd * b;
         }
 
+        // https://en.wikipedia.org/wiki/Binary_GCD_algorithm
         private static long Gcd(long a, long b)
         {
-            var max = Math.Max(a, b);
-            var min = Math.Min(a, b);
+            if (a < 0) throw new ArgumentOutOfRangeException(nameof(a), a, null);
+            if (b < 0) throw new ArgumentOutOfRangeException(nameof(b), b, null);
+            if (a == 0) return b;
+            if (b == 0) return a;
+
+            var i = BitOperations.TrailingZeroCount(a);
+            var k = BitOperations.TrailingZeroCount(b);
+            var x = a >> i;
+            var y = b >> k;
+
+            var max = Math.Max(x, y);
+            var min = Math.Min(x, y);
             while (min != 0)
             {
-                var mod = max % min;
+                max -= min;
+                max >>= BitOperations.TrailingZeroCount(max);
+                if (max >= min) continue;
+
+                var tmp = max;
                 max = min;
-                min = mod;
+                min = tmp;
             }
-            return max;
+
+            return max << Math.Min(i, k);
         }
     }
 }
