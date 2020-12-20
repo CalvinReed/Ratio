@@ -28,8 +28,8 @@ namespace CalvinReed
 
         public override int GetHashCode()
         {
-            var n = unchecked(numerator * 397);
-            return (n ^ falseDenominator).GetHashCode();
+            var l = unchecked(numerator * 397);
+            return (l ^ falseDenominator).GetHashCode();
         }
 
         public override bool Equals(object? obj)
@@ -77,20 +77,28 @@ namespace CalvinReed
 
         public static Ratio operator ++(Ratio ratio)
         {
-            return new(ratio.numerator + ratio.Denominator, ratio.falseDenominator);
+            var n = checked(ratio.numerator + ratio.Denominator);
+            return new Ratio(n, ratio.falseDenominator);
         }
 
         public static Ratio operator --(Ratio ratio)
         {
-            return new(ratio.numerator - ratio.Denominator, ratio.falseDenominator);
+            var n = checked(ratio.numerator - ratio.Denominator);
+            return new Ratio(n, ratio.falseDenominator);
         }
 
         public static Ratio operator +(Ratio left, Ratio right)
         {
-            var lcm = Lcm(left.Denominator, right.Denominator, out var gcd);
-            var n1 = left.numerator * (right.Denominator / gcd);
-            var n2 = right.numerator * (left.Denominator / gcd);
-            return Create(n1 + n2, lcm);
+            checked
+            {
+                var gcd = Gcd(left.Denominator, right.Denominator);
+                var leftFactor = left.Denominator / gcd;
+                var rightFactor = right.Denominator / gcd;
+                var lcm = leftFactor * rightFactor * gcd;
+                var n1 = left.numerator * rightFactor;
+                var n2 = right.numerator * leftFactor;
+                return Create(n1 + n2, lcm);
+            }
         }
 
         public static Ratio operator -(Ratio left, Ratio right)
@@ -100,9 +108,12 @@ namespace CalvinReed
 
         public static Ratio operator *(Ratio left, Ratio right)
         {
-            var n = left.numerator * right.numerator;
-            var d = left.Denominator * right.Denominator;
-            return Create(n, d);
+            checked
+            {
+                var n = left.numerator * right.numerator;
+                var d = left.Denominator * right.Denominator;
+                return Create(n, d);
+            }
         }
 
         public static Ratio operator /(Ratio left, Ratio right)
@@ -159,12 +170,6 @@ namespace CalvinReed
             var n = nAbs / gcd;
             var d = dAbs / gcd;
             return new Ratio(sign * n, d - 1);
-        }
-
-        private static long Lcm(long a, long b, out long gcd)
-        {
-            gcd = Gcd(a, b);
-            return a / gcd * b;
         }
 
         // https://en.wikipedia.org/wiki/Binary_GCD_algorithm
