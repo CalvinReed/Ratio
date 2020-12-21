@@ -10,10 +10,8 @@ namespace CalvinReed
 
         private Ratio(long numerator, long falseDenominator)
         {
-            if (falseDenominator < 0)
-            {
-                throw new Exception();
-            }
+            if (falseDenominator < 0) throw new DivideByZeroException();
+            if (numerator == long.MinValue || falseDenominator == long.MaxValue) throw new OverflowException();
 
             this.numerator = numerator;
             this.falseDenominator = falseDenominator;
