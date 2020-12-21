@@ -175,8 +175,6 @@ namespace CalvinReed
         {
             if (a < 0) throw new ArgumentOutOfRangeException(nameof(a), a, null);
             if (b < 0) throw new ArgumentOutOfRangeException(nameof(b), b, null);
-            if (a == 0) return b;
-            if (b == 0) return a;
 
             var i = BitOperations.TrailingZeroCount(a);
             var k = BitOperations.TrailingZeroCount(b);
