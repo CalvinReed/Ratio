@@ -56,21 +56,46 @@ namespace CalvinReed
             };
         }
 
-        private Ratio GetReciprocal()
+        public static Ratio Create(long numerator, long denominator)
         {
-            var n = Denominator * Math.Sign(numerator);
-            var d = Math.Abs(numerator) - 1;
+            var sign = Math.Sign(numerator) * Math.Sign(denominator);
+            var nAbs = Math.Abs(numerator);
+            var dAbs = Math.Abs(denominator);
+            var gcd = Gcd(nAbs, dAbs);
+            var n = nAbs / gcd;
+            var d = dAbs / gcd;
+            return new Ratio(sign * n, d - 1);
+        }
+
+        private static Ratio Reciprocal(Ratio ratio)
+        {
+            var n = ratio.Denominator * Math.Sign(ratio.numerator);
+            var d = Math.Abs(ratio.numerator) - 1;
             return new Ratio(n, d);
         }
 
-        public static Ratio operator +(Ratio ratio)
+        // https://en.wikipedia.org/wiki/Binary_GCD_algorithm
+        private static long Gcd(long a, long b)
         {
-            return ratio;
-        }
+            var i = BitOperations.TrailingZeroCount(a);
+            var k = BitOperations.TrailingZeroCount(b);
+            var x = a >> i;
+            var y = b >> k;
 
-        public static Ratio operator -(Ratio ratio)
-        {
-            return new(-ratio.numerator, ratio.falseDenominator);
+            var max = Math.Max(x, y);
+            var min = Math.Min(x, y);
+            while (min != 0)
+            {
+                max -= min;
+                max >>= BitOperations.TrailingZeroCount(max);
+                if (max >= min) continue;
+
+                var tmp = max;
+                max = min;
+                min = tmp;
+            }
+
+            return max << Math.Min(i, k);
         }
 
         public static Ratio operator ++(Ratio ratio)
@@ -99,11 +124,6 @@ namespace CalvinReed
             }
         }
 
-        public static Ratio operator -(Ratio left, Ratio right)
-        {
-            return left + -right;
-        }
-
         public static Ratio operator *(Ratio left, Ratio right)
         {
             checked
@@ -114,87 +134,17 @@ namespace CalvinReed
             }
         }
 
-        public static Ratio operator /(Ratio left, Ratio right)
-        {
-            return left * right.GetReciprocal();
-        }
-
-        public static bool operator ==(Ratio left, Ratio right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(Ratio left, Ratio right)
-        {
-            return !left.Equals(right);
-        }
-
-        public static bool operator <(Ratio left, Ratio right)
-        {
-            return left.CompareTo(right) < 0;
-        }
-
-        public static bool operator >(Ratio left, Ratio right)
-        {
-            return left.CompareTo(right) > 0;
-        }
-
-        public static bool operator <=(Ratio left, Ratio right)
-        {
-            return left.CompareTo(right) <= 0;
-        }
-
-        public static bool operator >=(Ratio left, Ratio right)
-        {
-            return left.CompareTo(right) >= 0;
-        }
-
-        public static implicit operator Ratio(long n)
-        {
-            return new(n, 0);
-        }
-
-        public static explicit operator double(Ratio ratio)
-        {
-            return (double) ratio.numerator / ratio.Denominator;
-        }
-
-        public static Ratio Create(long numerator, long denominator)
-        {
-            var sign = Math.Sign(numerator) * Math.Sign(denominator);
-            var nAbs = Math.Abs(numerator);
-            var dAbs = Math.Abs(denominator);
-            var gcd = Gcd(nAbs, dAbs);
-            var n = nAbs / gcd;
-            var d = dAbs / gcd;
-            return new Ratio(sign * n, d - 1);
-        }
-
-        // https://en.wikipedia.org/wiki/Binary_GCD_algorithm
-        private static long Gcd(long a, long b)
-        {
-            if (a < 0) throw new ArgumentOutOfRangeException(nameof(a), a, null);
-            if (b < 0) throw new ArgumentOutOfRangeException(nameof(b), b, null);
-
-            var i = BitOperations.TrailingZeroCount(a);
-            var k = BitOperations.TrailingZeroCount(b);
-            var x = a >> i;
-            var y = b >> k;
-
-            var max = Math.Max(x, y);
-            var min = Math.Min(x, y);
-            while (min != 0)
-            {
-                max -= min;
-                max >>= BitOperations.TrailingZeroCount(max);
-                if (max >= min) continue;
-
-                var tmp = max;
-                max = min;
-                min = tmp;
-            }
-
-            return max << Math.Min(i, k);
-        }
+        public static Ratio operator +(Ratio ratio) => ratio;
+        public static Ratio operator -(Ratio ratio) => new(-ratio.numerator, ratio.falseDenominator);
+        public static Ratio operator -(Ratio left, Ratio right) => left + -right;
+        public static Ratio operator /(Ratio left, Ratio right) => left * Reciprocal(right);
+        public static bool operator ==(Ratio left, Ratio right) => left.Equals(right);
+        public static bool operator !=(Ratio left, Ratio right) => !left.Equals(right);
+        public static bool operator <(Ratio left, Ratio right) => left.CompareTo(right) < 0;
+        public static bool operator >(Ratio left, Ratio right) => left.CompareTo(right) > 0;
+        public static bool operator <=(Ratio left, Ratio right) => left.CompareTo(right) <= 0;
+        public static bool operator >=(Ratio left, Ratio right) => left.CompareTo(right) >= 0;
+        public static implicit operator Ratio(long n) => new(n, 0);
+        public static explicit operator double(Ratio ratio) => (double) ratio.numerator / ratio.Denominator;
     }
 }
