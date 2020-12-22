@@ -25,6 +25,20 @@ namespace CalvinReed.Testing
             Assert.Equal(expected, actual);
         }
 
+        [Theory]
+        [InlineData(1, 2)]
+        [InlineData(2, 4)]
+        [InlineData(6, 5)]
+        [InlineData(long.MaxValue, 649657)]
+        public void HaveCorrectReciprocal(long n, long d)
+        {
+            var a = Ratio.Create(n, d);
+            var b = Ratio.Create(d, n);
+            var r = Ratio.Reciprocal(a);
+            Assert.Equal(b, r);
+            Assert.Equal(1, a * r);
+        }
+
         public static IEnumerable<object[]> AdditionData()
         {
             yield return new object[] {Ratio.Create(1, 3), Ratio.Create(1, 3), Ratio.Create(2, 3)};
@@ -41,6 +55,7 @@ namespace CalvinReed.Testing
             yield return new object[] {Ratio.Create(-1, 3), Ratio.Create(1, -3)};
             yield return new object[] {Ratio.Create(-1, 3), Ratio.Create(-2, 6)};
             yield return new object[] {Ratio.Create(-1, 3), Ratio.Create(2, -6)};
+            yield return new object[] {Ratio.Create(1, 289_740_712_999), Ratio.Create(31_833_193, long.MaxValue)};
         }
     }
 }

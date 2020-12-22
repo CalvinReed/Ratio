@@ -67,7 +67,7 @@ namespace CalvinReed
             return new Ratio(sign * n, d - 1);
         }
 
-        private static Ratio Reciprocal(Ratio ratio)
+        public static Ratio Reciprocal(Ratio ratio)
         {
             var n = ratio.Denominator * Math.Sign(ratio.numerator);
             var d = Math.Abs(ratio.numerator) - 1;
