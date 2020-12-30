@@ -117,7 +117,7 @@ namespace CalvinReed
                 var gcd = Gcd(left.Denominator, right.Denominator);
                 var leftFactor = left.Denominator / gcd;
                 var rightFactor = right.Denominator / gcd;
-                var lcm = leftFactor * rightFactor * gcd;
+                var lcm = leftFactor * right.Denominator;
                 var n1 = left.numerator * rightFactor;
                 var n2 = right.numerator * leftFactor;
                 return Create(n1 + n2, lcm);
