@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace CalvinReed
@@ -77,13 +78,14 @@ namespace CalvinReed
         // https://en.wikipedia.org/wiki/Binary_GCD_algorithm
         private static long Gcd(long a, long b)
         {
-            var i = BitOperations.TrailingZeroCount(a);
-            var k = BitOperations.TrailingZeroCount(b);
-            var x = a >> i;
-            var y = b >> k;
-
-            var max = Math.Max(x, y);
-            var min = Math.Min(x, y);
+            Debug.Assert(a >= 0);
+            Debug.Assert(b >= 0);
+            var aTrailing = BitOperations.TrailingZeroCount(a);
+            var bTrailing = BitOperations.TrailingZeroCount(b);
+            var aReduced = a >> aTrailing;
+            var bReduced = b >> bTrailing;
+            var max = Math.Max(aReduced, bReduced);
+            var min = Math.Min(aReduced, bReduced);
             while (min != 0)
             {
                 max -= min;
@@ -95,7 +97,7 @@ namespace CalvinReed
                 min = tmp;
             }
 
-            return max << Math.Min(i, k);
+            return max << Math.Min(aTrailing, bTrailing);
         }
 
         public static Ratio operator ++(Ratio ratio)
