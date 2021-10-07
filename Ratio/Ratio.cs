@@ -90,11 +90,10 @@ namespace CalvinReed
             {
                 max -= min;
                 max >>= BitOperations.TrailingZeroCount(max);
-                if (max >= min) continue;
-
-                var tmp = max;
-                max = min;
-                min = tmp;
+                if (max < min)
+                {
+                    (max, min) = (min, max);
+                }
             }
 
             return max << Math.Min(aTrailing, bTrailing);
